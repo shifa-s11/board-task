@@ -25,22 +25,25 @@ export default function LoginPage() {
     mode: "onChange",
   })
 
-  async function onSubmit(values: LoginInput) {
-    setIsLoading(true)
-    try {
-      await login(values.email, values.password)
-      toast.success("Check your email", {
-        description: "Enter the 6-digit OTP to continue.",
-      })
-      router.push("/otp")
-    } catch (err: any) {
-      toast.error("Login failed", {
-        description: String(err?.message ?? "Unable to login"),
-      })
-    } finally {
-      setIsLoading(false)
+async function onSubmit(values: LoginInput) {
+  setIsLoading(true)
+  try {
+    await login(values.email, values.password)
+    toast.success("Check your email", {
+      description: "Enter the 6-digit OTP to continue.",
+    })
+    router.push("/otp")
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      toast.error("Login failed", { description: err.message })
+    } else {
+      toast.error("Login failed", { description: "Unable to login" })
     }
+  } finally {
+    setIsLoading(false)
   }
+}
+
 
   return (
     <main className="flex min-h-dvh items-center justify-center bg-gray-100 p-4 dark:bg-zinc-950">

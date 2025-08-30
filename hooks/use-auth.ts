@@ -24,10 +24,16 @@ export function useAuth() {
       await mutate(data.token, false) 
 
       return data as { ok: true; token: string; user: { id: string; email: string } }
-    } catch (error: any) {
+    } catch (error) {
+    if (axios.isAxiosError(error)) {
       throw new Error(error.response?.data?.error || "Login failed")
     }
+    if (error instanceof Error) {
+      throw new Error(error.message)
+    }
+    throw new Error("Login failed")
   }
+}
 
   const logout = async () => {
     writeJSON(STORAGE_KEYS.AUTH, null)
@@ -48,16 +54,20 @@ export function useAuth() {
 //   return { isAuthenticated, logout, login, verifyOtp }
 // }
 
-  async function verifyOtp(email: string, code: string) {
-    try {
-      const res = await axios.post("/api/auth/otp", { email, code })
-      writeJSON(STORAGE_KEYS.AUTH, res.data.token);
-      await mutate(res.data.token, false);
-      return res.data as { ok: true; email: string }
-    } catch (error: any) {
-      throw new Error(error.response?.data?.error || "OTP verification failed")
+async function verifyOtp(email: string, code: string) {
+  try {
+    const res = await axios.post("/api/auth/otp", { email, code })
+    writeJSON(STORAGE_KEYS.AUTH, res.data.token)
+    await mutate(res.data.token, false)
+    return res.data as { ok: true; email: string }
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      throw new Error(err.response?.data?.error || "OTP verification failed")
     }
+    throw new Error("OTP verification failed")
   }
+}
+
 
   const isAuthenticated = !!token
 

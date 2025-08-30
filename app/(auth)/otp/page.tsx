@@ -30,28 +30,37 @@ export default function OtpPage() {
     mode: "onChange",
   })
 
-  async function onSubmit(values: OtpInput) {
-    setIsLoading(true)
-    try {
-      if (!profile?.email) {
-        toast.error("Missing email", {
-          description: "Please log in again.",
-        })
-        return router.replace("/login")
-      }
-      await verifyOtp(profile.email, values.code)
-      toast.success("Authenticated", {
-        description: "Welcome!",
+async function onSubmit(values: OtpInput) {
+  setIsLoading(true)
+  try {
+    if (!profile?.email) {
+      toast.error("Missing email", {
+        description: "Please log in again.",
       })
-      router.replace("/profile")
-    } catch (err: any) {
-      toast.error("Invalid OTP", {
-        description: String(err?.message ?? "Please try again"),
-      })
-    } finally {
-      setIsLoading(false)
+      return router.replace("/login")
     }
+
+    await verifyOtp(profile.email, values.code)
+
+    toast.success("Authenticated", {
+      description: "Welcome!",
+    })
+    router.replace("/profile")
+  } catch (err) {
+    if (err instanceof Error) {
+      toast.error("Invalid OTP", {
+        description: err.message,
+      })
+    } else {
+      toast.error("Invalid OTP", {
+        description: "Please try again",
+      })
+    }
+  } finally {
+    setIsLoading(false)
   }
+}
+
 
   return (
     <main className="flex min-h-dvh items-center justify-center bg-gray-100 p-4 dark:bg-zinc-950">
@@ -60,9 +69,9 @@ export default function OtpPage() {
           <CardTitle className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
             Enter OTP 🔐
           </CardTitle>
-          <CardDescription className="mt-2 text-balance text-zinc-600 dark:text-zinc-400">
-            We've sent a 6-digit code to your email.
-          </CardDescription>
+         <CardDescription className="mt-2 text-balance text-muted-foreground">
+  We&apos;ve sent a 6-digit code to your email.
+</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
