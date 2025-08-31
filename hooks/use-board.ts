@@ -136,7 +136,9 @@ export function useTasks(boardId: string) {
     const updated = all.filter((t) => t.id !== id)
     writeJSON(STORAGE_KEYS.TASKS, updated)
     await mutate(updated, false)
+    return updated
   }
+ 
 
   const moveTask = async (id: string, nextStatus: Task["status"]) => {
     const updated = all.map((t) =>

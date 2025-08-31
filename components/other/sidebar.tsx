@@ -13,13 +13,9 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
     { href: "/settings", label: "Settings", icon: Settings },
   ]
   return (
-    <aside className="h-full w-full flex flex-col border-r border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 transition-colors">
-      <div className="p-6 border-b border-zinc-200 dark:border-zinc-800">
-        <span className="text-xl font-bold tracking-tighter text-emerald-600 dark:text-emerald-500">
-          Kanban Flow
-        </span>
-      </div>
-      <nav className="flex-1 p-4 space-y-2">
+    <aside className="h-full w-full flex flex-col border-r border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 transition-colors pt-8">
+
+      <nav className="flex-1 p-4 space-y-2 pt-8">
         <ul className="space-y-1">
           {items.map((item) => {
             const Icon = item.icon

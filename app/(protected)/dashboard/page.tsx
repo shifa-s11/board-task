@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useMemo, useState } from "react"
@@ -17,7 +18,7 @@ import { useBoards } from "@/hooks/use-board"
 import { toast } from "sonner"
 
 const fetcher = async <T,>(key: string): Promise<T> => {
-  const data = readJSON<T>(key, [] as unknown as T); 
+  const data = readJSON<T>(key,[] as unknown as T);
   if (data === null) {
     return Promise.resolve([] as unknown as T);
   }
@@ -25,8 +26,8 @@ const fetcher = async <T,>(key: string): Promise<T> => {
 };
 
 export default function DashboardPage() {
-  const router = useRouter()
-const { boards, createBoard, isBoardsLoading } = useBoards()
+  const router = useRouter();
+  const { boards, createBoard,isBoardsLoading } = useBoards();
   const { data: allTasks = [], isLoading: isTasksLoading } = useSWR<Task[]>(
     STORAGE_KEYS.TASKS,
     (k) => fetcher<Task[]>(k),
@@ -34,25 +35,26 @@ const { boards, createBoard, isBoardsLoading } = useBoards()
       fallbackData: [],
       revalidateOnFocus: true,
     }
-  )
+  );
 
   const stats = useMemo(() => {
-    const totalBoards = boards.length
-    const totalTasks = allTasks.length
+    const totalBoards = boards.length;
+    const active = allTasks;
+    const totalAvailable = active.length;
     const byStatus = {
-      Pending: allTasks.filter((t) => t.status === "Pending").length,
-      Critical: allTasks.filter((t) => t.status === "Critical").length,
-      Urgent: allTasks.filter((t) => t.status === "Urgent").length,
-      Complete: allTasks.filter((t) => t.status === "Complete").length,
-    }
-    const recent = [...allTasks]
+      Pending: active.filter((t) => t.status === "Pending").length,
+      Critical: active.filter((t) => t.status === "Critical").length,
+      Urgent: active.filter((t) => t.status === "Urgent").length,
+      Complete: active.filter((t) => t.status === "Complete").length,
+    };
+    const recent = [...active]
       .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
-      .slice(0, 5)
-    return { totalBoards, totalTasks, byStatus, recent }
-  }, [boards, allTasks])
+      .slice(0, 5);
+    return { totalBoards, totalAvailable, byStatus, recent };
+  }, [boards, allTasks]);
 
-  const [boardName, setBoardName] = useState("")
-  const [isCreatingBoard, setIsCreatingBoard] = useState(false)
+  const [boardName, setBoardName] = useState("");
+  const [isCreatingBoard, setIsCreatingBoard] = useState(false);
 
   async function handleCreateBoard() {
     if (boardName.trim().length < 2) {
@@ -61,12 +63,12 @@ const { boards, createBoard, isBoardsLoading } = useBoards()
     }
     setIsCreatingBoard(true);
     try {
-      const b = await createBoard(boardName.trim())
-      setBoardName("")
+      const b = await createBoard(boardName.trim());
+      setBoardName("");
       toast.success("Board created!", {
         description: `Board "${b.name}" has been created.`,
-      })
-      router.push(`/boards/${b.id}`)
+      });
+      router.push(`/boards/${b.id}`);
     } catch (err) {
       toast.error("Failed to create board.", {
         description: `Error: ${err instanceof Error ? err.message : 'An unknown error occurred'}`,
@@ -89,7 +91,7 @@ const { boards, createBoard, isBoardsLoading } = useBoards()
         <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
         <p className="mt-4 text-zinc-500">Loading dashboard data...</p>
       </div>
-    )
+    );
   }
 
   return (
@@ -125,13 +127,13 @@ const { boards, createBoard, isBoardsLoading } = useBoards()
         <Card className="rounded-xl border-none shadow-md transition-all duration-200 ease-in-out hover:shadow-lg dark:bg-zinc-900">
           <CardHeader className="pb-2">
             <CardDescription className="text-zinc-600 dark:text-zinc-400">Total Tasks</CardDescription>
-            <CardTitle className="text-3xl font-bold text-blue-600 dark:text-blue-400">{stats.totalTasks}</CardTitle>
+            <CardTitle className="text-3xl font-bold text-blue-600 dark:text-blue-400">{stats.totalAvailable}</CardTitle>
           </CardHeader>
-          <CardContent className="text-sm text-zinc-500 dark:text-zinc-400">Across all boards</CardContent>
+          <CardContent className="text-sm text-zinc-500 dark:text-zinc-400">Excludes deleted items</CardContent>
         </Card>
         <Card className="rounded-xl border-none shadow-md transition-all duration-200 ease-in-out hover:shadow-lg dark:bg-zinc-900">
           <CardHeader className="pb-2">
-            <CardDescription className="text-zinc-600 dark:text-zinc-400">Done</CardDescription>
+            <CardDescription className="text-zinc-600 dark:text-zinc-400">Complete</CardDescription>
             <CardTitle className="text-3xl font-bold text-violet-600 dark:text-violet-400">{stats.byStatus.Complete}</CardTitle>
           </CardHeader>
           <CardContent className="text-sm text-zinc-500 dark:text-zinc-400">Tasks marked as completed</CardContent>
@@ -145,7 +147,7 @@ const { boards, createBoard, isBoardsLoading } = useBoards()
           <CardDescription className="text-zinc-600 dark:text-zinc-400">Distribution of tasks across your workflow</CardDescription>
         </CardHeader>
         <CardContent className="h-64">
-          {stats.totalTasks === 0 ? (
+          {stats.totalAvailable === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-sm text-zinc-500">
               <p>No tasks yet. Create a board to get started.</p>
               <Button onClick={() => router.push("/projects")} variant="link" className="mt-2 text-emerald-600">
@@ -261,7 +263,7 @@ const { boards, createBoard, isBoardsLoading } = useBoards()
                     </p>
                   </div>
                   <div className="flex items-center gap-2 mt-2 sm:mt-0">
-                    <Badge variant={t.status as 'default' | 'secondary' | 'outline'}>{t.status}</Badge>
+                    <Badge variant={t.status === "Complete" ? "default" : "secondary"}>{t.status}</Badge>
                     <Separator orientation="vertical" className="h-6 dark:bg-zinc-700 hidden sm:block" />
                     <Link href={`/boards/${t.boardId}`} className="text-emerald-600 hover:text-emerald-800 transition-colors text-sm flex items-center gap-1">
                       <LinkIcon className="h-4 w-4" /> Open board

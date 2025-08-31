@@ -136,6 +136,7 @@ export function TaskDialog({
                   <Input
                     type="date"
                     {...field}
+          min={new Date().toISOString().split("T")[0]}
                     className="h-10 rounded-md border border-zinc-300 bg-zinc-50 px-3 text-zinc-900 transition-colors placeholder:text-zinc-400 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder:text-zinc-600 dark:focus:border-emerald-500"
                     disabled={isSaving}
                   />
