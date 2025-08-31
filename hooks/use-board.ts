@@ -25,7 +25,7 @@ function seedIfEmpty() {
       {
         id: uid(),
         boardId: bId,
-        title: "Welcome to your Kanban!",
+        title: "Welcome to your FlowLabel!",
         description: "",
         status: "Pending",
         createdAt: now(),
