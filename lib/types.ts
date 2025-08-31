@@ -40,7 +40,7 @@ export const TaskSchema = z.object({
 export type TaskInput = z.infer<typeof TaskSchema>
 
 export type Board = {
-  id?: string
+  id: string
   name: string
   createdAt: string
 }
