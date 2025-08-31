@@ -46,7 +46,7 @@ export type Board = {
 }
 
 export type Task = {
-  id?: string
+  id: string
   boardId: string
   title: string
   description?: string
