@@ -4,14 +4,14 @@ import useSWR from "swr"
 import { readJSON, writeJSON, STORAGE_KEYS } from "@/lib/storage"
 import type { Board, Task } from "@/lib/types"
 
-// Helpers
+
 const readKey = async <T,>(key: string, fallback: T) =>
   Promise.resolve(readJSON<T>(key, fallback))
 
 const now = () => new Date().toISOString()
 const uid = () => Math.random().toString(36).slice(2) + Date.now().toString(36)
 
-// --- Seed initial data if storage is empty ---
+
 function seedIfEmpty() {
   const boards = readJSON<Board[]>(STORAGE_KEYS.BOARDS, [])
   const tasks = readJSON<Task[]>(STORAGE_KEYS.TASKS, [])
@@ -55,18 +55,16 @@ function seedIfEmpty() {
   }
 }
 
-// --- Boards Hook ---
 export function useBoards() {
   seedIfEmpty()
 
-  const { data, mutate } = useSWR<Board[]>(
-    STORAGE_KEYS.BOARDS,
-    (k) => readKey<Board[]>(k, []),
-    { fallbackData: readJSON<Board[]>(STORAGE_KEYS.BOARDS, []) }
-  )
+ const { data, isLoading,error, mutate } = useSWR<Board[]>(
+  STORAGE_KEYS.BOARDS,
+  (k) => readKey<Board[]>(k, []),
+  { fallbackData: readJSON<Board[]>(STORAGE_KEYS.BOARDS, []) }
+)
 
-  const boards = data ?? []
-
+const boards = data ?? []
   const createBoard = async (name: string) => {
     const next: Board = { id: uid(), name, createdAt: now() }
     const updated = [...boards, next]
@@ -92,7 +90,9 @@ export function useBoards() {
     await mutate(updatedBoards, false)
   }
 
-  return { boards, createBoard, renameBoard, deleteBoard }
+  return { boards, createBoard, renameBoard, deleteBoard,
+     isBoardsLoading: isLoading ?? (!data && !error),
+   }
 }
 
 // --- Tasks Hook ---
@@ -146,5 +146,5 @@ export function useTasks(boardId: string) {
     await mutate(updated, false)
   }
 
-  return { tasks, upsertTask, deleteTask, moveTask }
+  return { tasks, upsertTask, deleteTask, moveTask}
 }
