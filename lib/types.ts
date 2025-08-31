@@ -35,7 +35,7 @@ export const TaskSchema = z.object({
   description: z.string().optional(),
   status: TaskStatusEnum,
   assignee: z.string().optional(),
-  dueDate: z.string().optional(), 
+  dueDate: z.string().optional(), // ISO date string
 })
 export type TaskInput = z.infer<typeof TaskSchema>
 

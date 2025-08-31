@@ -30,6 +30,7 @@ function uid(prefix = "id") {
   return `${prefix}_${Math.random().toString(36).slice(2, 9)}`
 }
 
+// --- Seed data ---
 export function seedMockData() {
   if (boards.size > 0) return
 
@@ -57,6 +58,34 @@ export function resetMockData() {
   seedMockData()
 }
 
+// --- State dump helpers ---
+export type StateDump = {
+  boards: Board[]
+  tasks: Task[]
+}
+
+export function exportState(): StateDump {
+  return {
+    boards: Array.from(boards.values()).sort((a, b) => b.createdAt - a.createdAt),
+    tasks: Array.from(tasks.values()).sort((a, b) => a.createdAt - b.createdAt),
+  }
+}
+
+export function importState(state: StateDump) {
+  boards = new Map()
+  tasks = new Map()
+
+  for (const b of state.boards ?? []) {
+    boards.set(b.id, { ...b })
+  }
+  for (const t of state.tasks ?? []) {
+    if (boards.has(t.boardId)) {
+      tasks.set(t.id, { ...t })
+    }
+  }
+}
+
+// --- DB API ---
 export const db = {
   // Boards
   listBoards(): Board[] {
@@ -78,7 +107,6 @@ export const db = {
     return updated
   },
   deleteBoard(id: string): boolean {
-    // delete board and its tasks
     const ok = boards.delete(id)
     if (ok) {
       for (const t of Array.from(tasks.values())) {
@@ -121,4 +149,6 @@ export const db = {
     return tasks.delete(id)
   },
 }
+
 seedMockData()
+
