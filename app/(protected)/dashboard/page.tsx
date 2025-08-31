@@ -129,7 +129,6 @@ export default function DashboardPage() {
             <CardDescription className="text-zinc-600 dark:text-zinc-400">Total Tasks</CardDescription>
             <CardTitle className="text-3xl font-bold text-blue-600 dark:text-blue-400">{stats.totalAvailable}</CardTitle>
           </CardHeader>
-          <CardContent className="text-sm text-zinc-500 dark:text-zinc-400">Excludes deleted items</CardContent>
         </Card>
         <Card className="rounded-xl border-none shadow-md transition-all duration-200 ease-in-out hover:shadow-lg dark:bg-zinc-900">
           <CardHeader className="pb-2">
