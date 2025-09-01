@@ -54,7 +54,7 @@ async function onSubmit(values: LoginInput) {
             Welcome back 👋
           </CardTitle>
           <CardDescription className="mt-2 text-balance text-zinc-600 dark:text-zinc-400">
-            Sign in to continue to Kanban Flow
+            Sign in to continue to FlowLabel
           </CardDescription>
         </CardHeader>
         <CardContent>
